@@ -1,1 +1,77 @@
+pipeline
+{
+ tools
+ {
+   jdk 'myjava'
+   maven 'mymaven'
+}
+  agent any
+  stages
+  {
+   stage('checkout')
+   {  
+    steps
+    {
+      echo 'cloning'
+      git 'https://github.com/bgcprakash/DevOpsClassCodes.git'
+      }
+     }
+      
+      stage('compile')
+      {
+        steps
+        {
+          echo 'compile'
+          sh 'mvn compile'
+          }
+         }
+            stage('code review')
+            {
+              steps
+              {
+                echo 'code review'
+                sh 'mvn pmd:pmd'
+               }
+             }
+                stage('test')
+                {
+                  steps
+                  {
+                  sh 'mvn test'
+               }   
+                post
+                {
+                  success
+                  {
+                    junit ' ‘myproject/target/test-reports/*.xml’'
+                 }
+               }
+             }           
+                stage('code coverage')
+                {
+                  steps
+                    {
+                      sh 'mvn cobertura:cobertura'
+                    }
+                      post
+                      {
+                        success
+                        { 
+                          cobertura autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: '/target/site/cobertura/coverage.xml', conditionalCoverageTargets: '70, 0, 0', failUnhealthy: false, failUnstable: false, lineCoverageTargets: '80, 0, 0', maxNumberOfBuilds: 0, methodCoverageTargets: '80, 0, 0', onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false
+                    }
+                  }
+                }
+                      stage('package')
+                      {
+                        steps
+                        {
+                          sh 'mvn package'
+                         }
+                       }
+                }
+             }
+                
+                
+                
+        
 
